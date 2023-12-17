@@ -1,4 +1,13 @@
+const btn = document.getElementById('test')
+btn.addEventListener('click', async () => {
+    main()
+})
+
 window.addEventListener('load', async () => {
+    main()
+});
+
+async function main() {
     let screenDetails;
     if (!('getScreenDetails' in self) || !('isExtended' in screen) || !('onchange' in screen)) {
         console.log("not supported");
@@ -11,6 +20,8 @@ window.addEventListener('load', async () => {
             
          });
         permissionStatus = await navigator.permissions.query({ name: 'window-management' });
+
+        console.log({permissionStatus})
         permissionStatus.addEventListener('change', (p) => {
             permissionStatus = p;
         }
@@ -27,7 +38,7 @@ window.addEventListener('load', async () => {
             }
         }
     }
-});
+}
 
 function getFeaturesFromOptions(options) {
     return "left=" + options.left + ",top=" + options.top +
