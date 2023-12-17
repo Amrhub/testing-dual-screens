@@ -18,7 +18,7 @@ window.addEventListener('load', async () => {
     }
     if ('getScreenDetails' in self) {
         if (!screenDetails && ((permissionStatus && permissionStatus.state === 'granted') ||
-            (permissionStatus && permissionStatus.state === 'prompt' && requestPermission))) {
+            (permissionStatus && permissionStatus.state === 'prompt'))) {
             screenDetails = await getScreenDetails().catch(e => { console.error(e); return null; });
             if (screenDetails) {
                 const currentScreenLeft = screenDetails.currentScreen.left;
