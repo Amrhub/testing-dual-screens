@@ -3,6 +3,7 @@ btn.addEventListener('click', async () => {main()})
 window.addEventListener('load', async () => {main()});
 
 async function main() {
+    console.log("Trying Notification Permission version 1.0.0");
     let screenDetails;
     if (!('getScreenDetails' in self) || !('isExtended' in screen) || !('onchange' in screen)) {
         console.log("not supported");
