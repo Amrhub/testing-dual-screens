@@ -10,37 +10,51 @@ async function main() {
         screen.addEventListener('change', () => {});
         window.addEventListener('resize', () => {});
 
-        console.log("🚀 querying window-management permission");
-        permissionStatus = await navigator.permissions.query({ name: 'window-management' });
-        console.log(`🚀 ~ window-management ~ permissionStatus:`, permissionStatus)
-        
-        permissionStatus.addEventListener('change', (p) => {
-            permissionStatus = p;
+        try {
+            console.log("🚀 querying window-management permission");
+            windowManagementPermission = await navigator.permissions.query({ name: 'window-management' });
+            navigationPermission = await navigator.permissions.query({ name: 'notifications' });
+            console.log(`🚀 ~ window-management ~ permissionStatus:`, windowManagementPermission)
+            console.log(`🚀 ~ notifications ~ permissionStatus:`, navigationPermission)
+        } catch (error) {
+            console.error({error});
+        }
+        windowManagementPermission.addEventListener('change', (p) => {
+            windowManagementPermission = p;
+            console.log({windowManagementPermission, navigationPermission})
+        });
+        navigationPermission.addEventListener('change', (p) => {
+            navigationPermission = p;
+            console.log({windowManagementPermission, navigationPermission})
         });
     }
 
     if ('getScreenDetails' in self) {
 
-        if (!screenDetails && ((permissionStatus && permissionStatus.state === 'granted') ||
-            (permissionStatus && permissionStatus.state === 'prompt'))) {
-                console.log("🚀 getting screenDetails");
-                screenDetails = await getScreenDetails().catch(e => { console.error(
-                    "🚀 ~ getScreenDetails ~ error", e); return null; });
-                if (screenDetails) {
-                    const currentScreenLeft = screenDetails.currentScreen.left;
-                    const otherScreen = screenDetails.screens.filter(screen => screen.left !== currentScreenLeft)[0];
-                    const currentScreen = screenDetails.screens.find(screen => screen.left === currentScreenLeft);
-                    console.log("🚀 ~ primaryScreen screenDetails", currentScreen);
-                    console.log("🚀 ~ secondaryScreen screenDetails", otherScreen);
-                    try {
-                        console.log("🚀 ~ using window.open on first screen")
-                        window.open("https://dev-playerapp.intouch.com", undefined, getFeaturesFromOptions(currentScreen));
-                        console.log("🚀 ~ using window.open on second screen")
-                        window.open("https://dev-playerapp2.intouch.com", '_blank', getFeaturesFromOptions(otherScreen));
-                    } catch (error) {
-                        console.error("🚀 ~ failed opening window error", error);
-                    }
+        if (!screenDetails && ((windowManagementPermission && windowManagementPermission.state === 'granted') ||
+            (windowManagementPermission && windowManagementPermission.state === 'prompt'))) {
+            console.log("🚀 getting screenDetails");
+            screenDetails = await getScreenDetails().catch(e => { console.error(
+                "🚀 ~ getScreenDetails ~ error", e); return null; });
+            console.log("🚀 ~ screenDetails", screenDetails);
+            if (screenDetails) {
+                screenDetails.onscreenschange = (event) => {
+                    console.log(`🚀 ~ screenDetails.onscreenschange ~ event:`, event)
+                    console.log({
+                        screensLength: event?.target?.screens?.length,
+                    });
                 }
+                const currentScreen = screenDetails.screens.find(screen => screen.isPrimary);
+                const otherScreen = screenDetails.screens.find(screen => !screen.isPrimary && screen.isExtended);
+                console.log("🚀 ~ primaryScreen screenDetails", currentScreen);
+                console.log("🚀 ~ secondaryScreen screenDetails", otherScreen);
+                try {
+                    window.open("https://dev-playerapp.intouch.com", undefined, getFeaturesFromOptions(currentScreen));
+                    otherScreen && window.open("https://dev-playerapp2.intouch.com", '_blank', getFeaturesFromOptions(otherScreen));
+                } catch (error) {
+                    console.error({error})
+                }
+            }
         }
     }
 }
@@ -49,5 +63,4 @@ function getFeaturesFromOptions(options) {
     return "left=" + options.left + ",top=" + options.top +
            ",width=" + options.width + ",height=" + options.height +
            (options.fullscreen ? ",fullscreen" : "");
-  }
-  
+}
