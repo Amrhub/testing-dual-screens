@@ -3,7 +3,7 @@ btn.addEventListener('click', async () => {main()})
 window.addEventListener('load', async () => {main()});
 
 async function main() {
-    console.log("Trying Notification Permission version 1.0.0");
+    console.log("Trying Notification Permission version 1.0.1");
     let screenDetails;
     if (!('getScreenDetails' in self) || !('isExtended' in screen) || !('onchange' in screen)) {
         console.log("not supported");
@@ -39,6 +39,12 @@ async function main() {
                 "🚀 ~ getScreenDetails ~ error", e); return null; });
             console.log("🚀 ~ screenDetails", screenDetails);
             if (screenDetails) {
+                screenDetails.oncurrentscreenchange = (event) => {
+                    console.log({
+                        currentScreenChangeEvent: event,
+                        currentScreenChange: event.target
+                    })
+                }
                 screenDetails.onscreenschange = (event) => {
                     console.log(`🚀 ~ screenDetails.onscreenschange ~ event:`, event)
                     console.log({
