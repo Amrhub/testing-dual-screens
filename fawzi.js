@@ -30,7 +30,7 @@ async function main() {
                     const currentScreenLeft = screenDetails.currentScreen.left;
                     const otherScreen = screenDetails.screens.filter(screen => screen.left !== currentScreenLeft)[0];
                     const currentScreen = screenDetails.screens.find(screen => screen.left === currentScreenLeft);
-                    console.log("🚀 ~ primaryScreen screenDetails", primaryScreen);
+                    console.log("🚀 ~ primaryScreen screenDetails", currentScreen);
                     console.log("🚀 ~ secondaryScreen screenDetails", otherScreen);
                     try {
                         console.log("🚀 ~ using window.open on first screen")
